@@ -3,7 +3,7 @@
 Alexander Beck
 Nate Schneider
 
-Dataset link: [https://www.kaggle.com/datasets/yasserh/song-popularity-dataset](https://www.kaggle.com/datasets/yasserh/song-popularity-dataset)
+Dataset link: [https://www.kaggle.com/datasets/tonygordonjr/spotify-dataset-2023?select=spotify_data_12_20_2023.csv](https://www.kaggle.com/datasets/tonygordonjr/spotify-dataset-2023?select=spotify_data_12_20_2023.csv)
 
 ## Installation
 

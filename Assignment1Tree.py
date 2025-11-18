@@ -37,7 +37,7 @@ class Node:
 class Tree(object):
     '''
         Decision Tree (with discrete attributes). 
-        We are using ID3(Iterative Dichotomiser 3) algorithm. So this decision tree is also called ID3.
+        ID3 Tree is replaced with a stochastic version that selects the best attribute from a random subset of attributes.
     '''
     #--------------------------
     @staticmethod
@@ -135,9 +135,8 @@ class Tree(object):
     @staticmethod
     def best_attribute(X,Y):
         '''
-            Find the best attribute to split the node. 
-            Here we use information gain to evaluate the attributes. 
-            If there is a tie in the best attributes, select the one with the smallest index.
+            Find the best attribute to split the node. Changed from project 1 to a stochastic version. 
+            
             Input:
                 X: the feature matrix, a numpy matrix of shape p by n. 
                    Each element can be int/float/string.
@@ -148,17 +147,40 @@ class Tree(object):
         '''
         #########################################
         ## INSERT YOUR CODE HERE
+        #This remains the same as before, the search logic is all that changes.
         numFeatures = X.shape[0]
         bestGain = -np.inf
         i = 0
-        for c in range(numFeatures):
+        
+        #determine subset size as root of total features, at least 1
+        subsetSize = max(1, int(np.sqrt(numFeatures)))
+
+        #randomly select subset of features
+        featureIndices = np.random.choice(numFeatures, size=subsetSize, replace=False)
+
+        for c in featureIndices: #for each feature in the random subset
             currentFeature = X[c,:]
             
             newGain = Tree.information_gain(Y,currentFeature)
             
             if newGain > bestGain:
+                #take new best
                 bestGain = newGain
                 i = c
+
+            elif newGain == bestGain:
+                #randomly choose between the two features
+                if np.random.rand() > 0.5:
+                    i = c
+
+        #for c in range(numFeatures): OLD CODE
+        #    currentFeature = X[c,:]
+            
+        #   newGain = Tree.information_gain(Y,currentFeature)
+            
+        #   if newGain > bestGain:
+        #      bestGain = newGain
+        #      i = c
 
         #########################################
         return i

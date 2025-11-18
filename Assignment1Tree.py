@@ -84,29 +84,30 @@ class Tree(object):
         '''
         #########################################
         ## INSERT YOUR CODE HERE
-        xCounts = collections.Counter(X)
-        xLength = len(X)
+        nodes = collections.defaultdict(list)
+
+        # Use a hash table for different values of x -> y
+        # Faster than original implementation since we aren't recomputing lists over and over again
+        for x, y in zip(X, Y):
+            nodes[x].append(y)
     
         ce = 0.0
-    
+        
+        yLength = len(Y)
         # Iterate through each unique attribute value
-        for xVal, xCount in xCounts.items():
-            
-            newY = [Y[i] for i, x in enumerate(X) if x == xVal]
+        # for xVal, xCount in xCounts.items():
+        for ys in nodes.values():
         
             # Calculate the probability of this attribute value
-            p_x = xCount / xLength
+            p_x = len(ys) / yLength
+
             # Calculate the entropy of the subset of target labels
-            entropyYGivenX = Tree.entropy(newY)
+            entropyYGivenX = Tree.entropy(ys)
         
             # Sum the weighted entropies
             ce += p_x * entropyYGivenX
         
-   
-
-        #########################################
-        return ce 
-    
+        return ce
     
     
     #--------------------------

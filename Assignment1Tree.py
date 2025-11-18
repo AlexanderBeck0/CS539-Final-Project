@@ -290,7 +290,7 @@ class Tree(object):
     
     #--------------------------
     @staticmethod
-    def build_tree(t):
+    def build_tree(t,max_depth,current_depth=0):
         '''
             Recursively build tree nodes.
             Input:
@@ -307,7 +307,7 @@ class Tree(object):
         #default prediction, will be overwritten if leaf.
         t.p = Tree.most_common(t.Y)
         
-        if Tree.stop1(t.Y) or Tree.stop2(t.X):
+        if Tree.stop1(t.Y) or Tree.stop2(t.X) or max_depth == current_depth:
             t.isleaf = True
             t.p = Tree.most_common(t.Y)
             return
@@ -330,7 +330,7 @@ class Tree(object):
     
     #--------------------------
     @staticmethod
-    def train(X, Y):
+    def train(X, Y, max_depth=np.inf):
         '''
             Given a training set, train a decision tree. 
             Input:
@@ -345,7 +345,7 @@ class Tree(object):
         #########################################
         ## INSERT YOUR CODE HERE
         t = Node(X, Y)
-        Tree.build_tree(t)
+        Tree.build_tree(t, max_depth)
         #########################################
         return t
     

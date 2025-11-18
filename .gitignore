@@ -15,3 +15,4 @@ high_popularity_spotify_data.csv
 low_popularity_spotify_data.csv
 spotify_data_12_20_2023.csv
 decision_tree.dot
+*.pkl

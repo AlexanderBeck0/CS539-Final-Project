@@ -26,10 +26,10 @@ class Node:
             p: the label to be predicted on the node (i.e., most common label in the node).
     '''
     def __init__(self,X,Y, i=None,C=None, isleaf= False,p=None):
-        self.X = X
-        self.Y = Y
-        self.i = i
-        self.C= C
+        self.X: np.ndarray = X
+        self.Y: np.ndarray = Y
+        self.i: int = i or -1
+        self.C: dict = C or {}
         self.isleaf = isleaf
         self.p = p
 
@@ -133,7 +133,7 @@ class Tree(object):
 
     #--------------------------
     @staticmethod
-    def best_attribute(X,Y):
+    def best_attribute(X: np.ndarray, Y: np.ndarray):
         '''
             Find the best attribute to split the node. Changed from project 1 to a stochastic version. 
             
@@ -290,7 +290,7 @@ class Tree(object):
     
     #--------------------------
     @staticmethod
-    def build_tree(t,max_depth,current_depth=0):
+    def build_tree(t: Node, max_depth: int, current_depth: int =0) -> None:
         '''
             Recursively build tree nodes.
             Input:
@@ -330,7 +330,7 @@ class Tree(object):
     
     #--------------------------
     @staticmethod
-    def train(X, Y, max_depth=np.inf):
+    def train(X: np.typing.ArrayLike, Y: np.typing.ArrayLike, max_depth=np.inf) -> Node:
         '''
             Given a training set, train a decision tree. 
             Input:
@@ -345,7 +345,7 @@ class Tree(object):
         #########################################
         ## INSERT YOUR CODE HERE
         t = Node(X, Y)
-        Tree.build_tree(t, max_depth)
+        Tree.build_tree(t, max_depth) # type: ignore
         #########################################
         return t
     
@@ -353,7 +353,7 @@ class Tree(object):
     
     #--------------------------
     @staticmethod
-    def inference(t,x):
+    def inference(t: Node, x: np.ndarray):
         '''
             Given a decision tree and one data instance, infer the label of the instance recursively. 
             Input:
@@ -406,6 +406,7 @@ class Tree(object):
         #########################################
         return Y
 
+    @staticmethod
     def inference_proba(t, x, classes):
         '''
             Given a decision tree and one data instance, infer the class probabilities recursively. 
@@ -441,6 +442,7 @@ class Tree(object):
                     proba[idx] = counts[cls] / n
             return proba
 
+    @staticmethod
     def predict_proba(t, X):
         '''
             Given a decision tree and a dataset, predict the class probabilities on the dataset. 

@@ -323,7 +323,7 @@ class Tree(object):
             return
         # Recursively build subtrees for each child
         for childNode in t.C.values():
-            Tree.build_tree(childNode)
+            Tree.build_tree(childNode, max_depth=max_depth, current_depth=current_depth + 1)
  
         #########################################
     

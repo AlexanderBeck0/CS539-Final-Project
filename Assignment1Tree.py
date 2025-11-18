@@ -406,8 +406,58 @@ class Tree(object):
         #########################################
         return Y
 
+    def inference_proba(t, x, classes):
+        '''
+            Given a decision tree and one data instance, infer the class probabilities recursively. 
+            Returns a numpy array of probabilities (shape 2,) corresponding to the order in 'classes'.
+        '''
+        # --- Base Case: Leaf Node ---
+        if t.isleaf:
+            # Count the labels in this node
+            counts = collections.Counter(t.Y)
+            n = len(t.Y)
+            
+            # Create probability vector initialized to zeros
+            proba = np.zeros(len(classes), dtype=float)
+            
+            for idx, cls in enumerate(classes):
+                if n > 0:
+                    # Calculate P(class) = Count(class) / Total
+                    proba[idx] = counts[cls] / n
+            return proba
+        # --- Recursive Case: Internal Node ---
+        splitValue = x[t.i]
+        if splitValue in t.C:
+            # Traverse to the child node
+            return Tree.inference_proba(t.C[splitValue], x, classes)
+        else:
+            # Handling unseen value for this attribute: 
+            # Default to the current node's probabilities (similar to a leaf prediction)
+            counts = collections.Counter(t.Y)
+            n = len(t.Y)
+            proba = np.zeros(len(classes), dtype=float)
+            for idx, cls in enumerate(classes):
+                if n > 0:
+                    proba[idx] = counts[cls] / n
+            return proba
 
-
+    def predict_proba(t, X):
+        '''
+            Given a decision tree and a dataset, predict the class probabilities on the dataset. 
+            Returns a numpy matrix of shape (num_instances, num_classes).
+        '''
+        numInstances = X.shape[1]
+        classes = sorted(np.unique(t.Y))
+        numClasses = len(classes)
+        
+        # Initialize probability matrix
+        proba_matrix = np.zeros((numInstances, numClasses), dtype=float)
+        
+        for i in range(numInstances):
+            x = X[:, i]
+            proba_matrix[i, :] = Tree.inference_proba(t, x, classes)
+        
+        return proba_matrix, classes
     #--------------------------
     @staticmethod
     def load_dataset(filename = 'data1.csv'):

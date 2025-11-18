@@ -1,4 +1,3 @@
-import math
 import numpy as np
 import collections
 # Note: please don't add any new package, you should solve this problem using only the packages above.
@@ -301,7 +300,7 @@ class Tree(object):
             t.p = Tree.most_common(t.Y)
             return
         # Recursively build subtrees for each child
-        for value, childNode in t.C.items():
+        for childNode in t.C.values():
             Tree.build_tree(childNode)
  
         #########################################

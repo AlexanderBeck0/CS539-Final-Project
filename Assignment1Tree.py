@@ -8,7 +8,7 @@ import collections
     In this problem, you will implement the decision tree method for classification problems.
     You could test the correctness of your code by typing `pytest -v test1.py` in the terminal.
 '''
-
+#TODO: adapt to work with our dataset
 #-----------------------------------------------
 class Node:
     '''

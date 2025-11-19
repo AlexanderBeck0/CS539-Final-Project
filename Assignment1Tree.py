@@ -372,13 +372,15 @@ class Tree(object):
             Y: the class labels, a numpy array of length n.
                Each element can be int/float/string.
         """
-        numInstances = X.shape[1]
-        Y = np.zeros(numInstances, dtype=object)
-        for i in range(numInstances):
-            x = X[:, i]
-            Y[i] = Tree.inference(t, x)
+        Y: list = []
 
-        return Y
+        if not isinstance(X, np.ndarray):
+            # Type checking
+            X = np.asarray(X)
+
+        for x in X.transpose():
+            Y.append(Tree.inference(t, x))
+        return np.array(Y)
 
     @staticmethod
     def inference_proba(t, x, classes):

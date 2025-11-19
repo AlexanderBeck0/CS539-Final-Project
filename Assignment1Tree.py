@@ -422,18 +422,16 @@ class Tree(object):
         Given a decision tree and a dataset, predict the class probabilities on the dataset.
         Returns a numpy matrix of shape (num_instances, num_classes).
         """
-        numInstances = X.shape[1]
+        if not isinstance(X, np.ndarray):
+            X = np.asarray(X)
+
         classes = sorted(np.unique(t.Y))
-        numClasses = len(classes)
+        proba_list = []
 
-        # Initialize probability matrix
-        proba_matrix = np.zeros((numInstances, numClasses), dtype=float)
+        for x in X.transpose():
+            proba_list.append(Tree.inference_proba(t, x, classes))
 
-        for i in range(numInstances):
-            x = X[:, i]
-            proba_matrix[i, :] = Tree.inference_proba(t, x, classes)
-
-        return proba_matrix, classes
+        return np.array(proba_list), classes
 
     # --------------------------
     @staticmethod

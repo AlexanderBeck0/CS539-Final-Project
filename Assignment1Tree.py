@@ -302,23 +302,27 @@ class Tree(object):
 
         if Tree.stop1(t.Y) or Tree.stop2(t.X) or max_depth == current_depth:
             t.isleaf = True
-            t.p = Tree.most_common(t.Y)
             return
 
         t.i = Tree.best_attribute(t.X, t.Y)
+
+        # TODO: Ensure that these optimizations don't affect the behavior
+        # Check for edge case of only one unique value
+        if np.unique(t.X[t.i]).size == 1:
+            t.isleaf = True
+            return
 
         # Split the data and get children nodes
         t.C = Tree.split(t.X, t.Y, t.i)
 
         if not t.C:
             t.isleaf = True
-            t.p = Tree.most_common(t.Y)
             return
+
         # Recursively build subtrees for each child
+        next_depth = current_depth + 1
         for childNode in t.C.values():
-            Tree.build_tree(
-                childNode, max_depth=max_depth, current_depth=current_depth + 1
-            )
+            Tree.build_tree(childNode, max_depth, next_depth)
 
     # --------------------------
     @staticmethod
@@ -402,7 +406,7 @@ class Tree(object):
         """
         counts = np.bincount(Y, minlength=len(classes))
         return counts / counts.sum()
-    
+
     @staticmethod
     def _inference_proba(t, x, classes):
         """
@@ -450,7 +454,7 @@ class Tree(object):
             else:
                 return t.proba
         return t.proba
-            
+
     @staticmethod
     def predict_proba(t, X):
         """

@@ -57,6 +57,9 @@ class Node:
         self.p: Any = p
         """The label to be predicted on the node (i.e., most common label in the node).
         """
+        self.proba: np.ndarray
+        """ The probability vector of the node. Numpy array of shape (num_classes,).
+        """
 
 
 # -----------------------------------------------
@@ -79,7 +82,7 @@ class Tree(object):
         """
         counts = collections.Counter(Y)
 
-        # Get lenght
+        # Get length
         yLength = len(Y)
 
         e = 0.0  # Initialize
@@ -295,6 +298,8 @@ class Tree(object):
         # default prediction, will be overwritten if leaf.
         t.p = Tree.most_common(t.Y)
 
+        t.proba = Tree.compute_node_proba(t.Y, Tree._global_classes)
+
         if Tree.stop1(t.Y) or Tree.stop2(t.X) or max_depth == current_depth:
             t.isleaf = True
             t.p = Tree.most_common(t.Y)
@@ -329,6 +334,7 @@ class Tree(object):
         Output:
             t: the root of the tree.
         """
+        Tree._global_classes = sorted(np.unique(Y))
         t = Node(X, Y)
         Tree.build_tree(t, max_depth)  # type: ignore
         return t
@@ -383,7 +389,22 @@ class Tree(object):
         return np.array(Y)
 
     @staticmethod
-    def inference_proba(t, x, classes):
+    def compute_node_proba(Y, classes) -> np.ndarray:
+        """Computes the probability vector for the given Y.
+
+        Args:
+            Y: the class labels, a numpy array of length n.
+               Each element can be int/float/string.
+            classes: The different classes.
+
+        Returns:
+            np.ndarray: The probability vector for the given Y and classes.
+        """
+        counts = np.bincount(Y, minlength=len(classes))
+        return counts / counts.sum()
+    
+    @staticmethod
+    def _inference_proba(t, x, classes):
         """
         Given a decision tree and one data instance, infer the class probabilities recursively.
         Returns a numpy array of probabilities (shape 2,) corresponding to the order in 'classes'.
@@ -405,7 +426,7 @@ class Tree(object):
         splitValue = x[t.i]
         if splitValue in t.C:
             # Traverse to the child node
-            return Tree.inference_proba(t.C[splitValue], x, classes)
+            return Tree._inference_proba(t.C[splitValue], x, classes)
         else:
             # Default to the current node's probabilities
             counts = collections.Counter(t.Y)
@@ -416,6 +437,20 @@ class Tree(object):
                     proba[idx] = counts[cls] / n
             return proba
 
+    @staticmethod
+    def inference_proba(t: Node, x, classes):
+        """
+        Given a decision tree and one data instance, infer the class probabilities recursively.
+        Returns a numpy array of probabilities (shape 2,) corresponding to the order in 'classes'.
+        """
+        while not t.isleaf:
+            splitValue = x[t.i]
+            if splitValue in t.C:
+                t = t.C[splitValue]
+            else:
+                return t.proba
+        return t.proba
+            
     @staticmethod
     def predict_proba(t, X):
         """

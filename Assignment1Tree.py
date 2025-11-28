@@ -160,40 +160,22 @@ class Tree(object):
         """
         # This remains the same as before, the search logic is all that changes.
         numFeatures = X.shape[0]
-        bestGain = -np.inf
-        i = 0
 
         # determine subset size as root of total features, at least 1
         subsetSize = max(1, int(np.sqrt(numFeatures)))
 
-        # randomly select subset of features
-        featureIndices = np.random.choice(numFeatures, size=subsetSize, replace=False)
+        shuffled_indices = np.arange(numFeatures)
+        np.random.shuffle(shuffled_indices)
 
-        for c in featureIndices:  # for each feature in the random subset
-            currentFeature = X[c, :]
+        # First subsetSize features
+        feature_subset = shuffled_indices[:subsetSize]
 
-            newGain = Tree.information_gain(Y, currentFeature)
+        subset = X[feature_subset, :]
 
-            if newGain > bestGain:
-                # take new best
-                bestGain = newGain
-                i = c
+        gains = np.array([Tree.information_gain(Y, f) for f in subset])
 
-            elif newGain == bestGain:
-                # randomly choose between the two features
-                if np.random.rand() > 0.5:
-                    i = c
-
-        # for c in range(numFeatures): OLD CODE
-        #    currentFeature = X[c,:]
-
-        #   newGain = Tree.information_gain(Y,currentFeature)
-
-        #   if newGain > bestGain:
-        #      bestGain = newGain
-        #      i = c
-
-        return i
+        best_gains_index = np.argmax(gains)
+        return feature_subset[best_gains_index]
 
     # --------------------------
     @staticmethod
